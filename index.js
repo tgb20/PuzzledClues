@@ -6,7 +6,7 @@ const cors = require('cors');
 const dotenv = require("dotenv");
 dotenv.config();
 
-const PORT = 80;
+const PORT = process.env.PORT || 80;
 
 mongoose.connect('mongodb+srv://puzzledAPI:' + process.env.MONGO_PASSWORD + '@cluster0-m1khb.mongodb.net/puzzled?retryWrites=true&w=majority', { useNewUrlParser: true });
 
