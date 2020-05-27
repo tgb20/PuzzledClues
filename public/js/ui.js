@@ -2,7 +2,7 @@ let timer;
 
 let numOfClues = 5;
 
-$(function () {
+$(() => {
     $('#time-container').hide();
     $('#clues-container').hide();
     $('#solved-message-container').hide();
@@ -13,15 +13,15 @@ $(function () {
 
     $('#error-close-button').click(() => {
         $('#error-message-container').hide();
-    })
+    });
 
     $('#unsolved-close-button').click(() => {
         $('#unsolved-message-container').hide();
-    })
+    });
 
     $('#error-clue-container').click(() => {
         $('#error-clue-container').hide();
-    })
+    });
 
     $('#end-button').click(() => {
         let password = $('#final-password').val();
@@ -57,7 +57,7 @@ $(function () {
                     $('#password-container').hide();
                 }
             }));
-        })
+        });
     });
 
     $("#start-button").click(() => {
@@ -120,75 +120,75 @@ $(function () {
                 fetch('api/clues/' + boxCode).then((clueResponse) => {
                     clueResponse.json().then(clueJSON => {
                         let clues = clueJSON.clues;
-                            clues.forEach(clue => {
-                                let clueBox = $('#template-clue').clone();
-                                clueBox.attr("id","");
-                                clueBox.addClass("clue");
-                                clueBox.find('.header').text(clue.title);
-                                clueBox.find('#unlocked').hide();
+                        clues.forEach(clue => {
+                            let clueBox = $('#template-clue').clone();
+                            clueBox.attr("id", "");
+                            clueBox.addClass("clue");
+                            clueBox.find('.header').text(clue.title);
+                            clueBox.find('#unlocked').hide();
 
-                                if(clue.answer) {
-                                    let answer = clue.answer;
+                            if (clue.answer) {
+                                let answer = clue.answer;
 
-                                    let description = clueBox.find('.description');
+                                let description = clueBox.find('.description');
 
-                                    clueBox.find('#clue-unlock').hide();
-                                    clueBox.find('#unlocked').show();
+                                clueBox.find('#clue-unlock').hide();
+                                clueBox.find('#unlocked').show();
 
-                                    description.find('img').hide();
-                                    description.text(answer);
-                                }
+                                description.find('img').hide();
+                                description.text(answer);
+                            }
 
 
 
-                                clueBox.find('#clue-unlock').click(() => {
+                            clueBox.find('#clue-unlock').click(() => {
 
-                                    $('#error-message-container').hide();
-                                    $('#unsolved-message-container').hide();
-                                    $('#error-clue-container').hide();
+                                $('#error-message-container').hide();
+                                $('#unsolved-message-container').hide();
+                                $('#error-clue-container').hide();
 
-                                    fetch('api/clues/' + boxCode + '/' + clue.clueID).then((answerResponse) => {
-                                        answerResponse.json().then(answerJSON => {
-                                            if (answerJSON.error) {
-                                                if (answerJSON.error == "invalid_code") {
-                                                    $('#error-title').text('There was a problem with your box code');
-                                                    $('#error-subtitle').text('Please make sure your box code matches the one that came with your box');
-                                                    $('#error-clue-container').show(250);
-                                                }
-                                                if (answerJSON.error == "database") {
-                                                    $('#error-title').text('There was a problem with the Database');
-                                                    $('#error-subtitle').text('Please try again later');
-                                                    $('#error-clue-container').show(250);
-                                                }
-                                                if (answerJSON.error == "no_clues") {
-                                                    $('#error-title').text('You have no clues left!');
-                                                    $('#error-subtitle').text('You can take a penalty to add clues');
-                                                    $('#error-clue-container').show(250);
-                                                }
-                                                return;
+                                fetch('api/clues/' + boxCode + '/' + clue.clueID).then((answerResponse) => {
+                                    answerResponse.json().then(answerJSON => {
+                                        if (answerJSON.error) {
+                                            if (answerJSON.error == "invalid_code") {
+                                                $('#error-title').text('There was a problem with your box code');
+                                                $('#error-subtitle').text('Please make sure your box code matches the one that came with your box');
+                                                $('#error-clue-container').show(250);
                                             }
-                                            let answer = answerJSON.answer;
+                                            if (answerJSON.error == "database") {
+                                                $('#error-title').text('There was a problem with the Database');
+                                                $('#error-subtitle').text('Please try again later');
+                                                $('#error-clue-container').show(250);
+                                            }
+                                            if (answerJSON.error == "no_clues") {
+                                                $('#error-title').text('You have no clues left!');
+                                                $('#error-subtitle').text('You can take a penalty to add clues');
+                                                $('#error-clue-container').show(250);
+                                            }
+                                            return;
+                                        }
+                                        let answer = answerJSON.answer;
 
-                                            let description = clueBox.find('.description');
+                                        let description = clueBox.find('.description');
 
-                                            clueBox.find('#clue-unlock').hide();
-                                            clueBox.find('#unlocked').show();
+                                        clueBox.find('#clue-unlock').hide();
+                                        clueBox.find('#unlocked').show();
 
-                                            description.find('img').hide();
-                                            description.text(answer);
+                                        description.find('img').hide();
+                                        description.text(answer);
 
 
-                                            cluesLeft -= 1;
-                                            $('#clues-remaining').text(cluesLeft);
-                                        });
-                                    })
-                                });
-
-                                clueBox.show();
-                                clueBox.appendTo('#clues-list');
-
+                                        cluesLeft -= 1;
+                                        $('#clues-remaining').text(cluesLeft);
+                                    });
+                                })
                             });
-                    })
+
+                            clueBox.show();
+                            clueBox.appendTo('#clues-list');
+
+                        });
+                    });
                 });
 
                 $('#clues-container').show(250);

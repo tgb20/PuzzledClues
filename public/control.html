@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Puzzled Clues</title>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"
+        integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.js"
+        integrity="sha256-t8GepnyPmw9t+foMh3mKNvcorqNHamSKtKRxxpUEgFI=" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css"
+        integrity="sha256-9mbkOfVho3ZPXfM7W8sV2SndrGDuh7wuyLjtsWeTI1Q=" crossorigin="anonymous" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/components/progress.min.js"
+        integrity="sha256-B676J/Jywi6IJ9e/E62nmk7Gn9KDkRQc7RfcIBKPQcI=" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/components/progress.min.css"
+        integrity="sha256-dkrthuAV9Awq6a3FATGJx0SCoj+K/3Umzv2dq0jNNrA=" crossorigin="anonymous" />
+    <script src="/js/control.js"></script>
+</head>
+
+<body>
+    <div class="ui raised very padded text container segment">
+        <div id="error-message-container" class="ui negative message">
+            <i id="error-close-button" class="close icon"></i>
+            <div id="error-title" class="header">
+                Error Title
+            </div>
+            <p id="error-subtitle">
+                Error Subtitle
+            </p>
+        </div>
+        <h2 class="ui header">Control Panel</h2>
+        <div class="ui labeled input">
+            <label for="password" class="ui label">Password:</label>
+            <input id="password" type="password" placeholder="*******">
+        </div>
+        <br>
+        <br>
+        <div>
+            <button id="log-in-button" class="ui primary button">
+                Log In
+            </button>
+        </div>
+    </div>
+    <div id='control-area-container' class="ui raised very padded text container segment">
+        <div id="positive-message-container" class="ui positive message">
+            <i id="positive-close-button" class="close icon"></i>
+            <div id="positive-title" class="header">
+                Positive Title
+            </div>
+            <p id="positive-subtitle">
+                Positive Subtitle
+            </p>
+        </div>
+        <div class="ui secondary pointing menu">
+            <a id='boxes-button' class="tabitem item active">
+                Boxes
+            </a>
+            <a id='clues-button' class="tabitem item">
+                Clues
+            </a>
+            <div class="right menu">
+                <a id='add-button' class="ui item">
+                    <i class="plus icon"></i>
+                </a>
+            </div>
+        </div>
+        <div id='boxes-container'>
+            Boxes
+        </div>
+        <div id='clues-container'>
+            <div id='clues-list' class="ui middle aligned divided list">
+                <div id="template-clue" class="item">
+                    <div class="right floated content">
+                        <button class="clueTrash ui icon negative button">
+                            <i class="trash icon"></i>
+                        </button>
+                    </div>
+                    <div class="content">
+                        <div style="width:90%" class="ui labeled input">
+                            <label for="clueTitle" class="ui label">Title</label>
+                            <input class="clueTitle" type="text" placeholder="Clue Title...">
+                        </div>
+                        <br>
+                        <br>
+                        <div style="width:90%" class="ui labeled input">
+                            <label for="clueMessage" class="ui label">Answer</label>
+                            <input class="clueMessage" type="text" placeholder="Clue Answer...">
+                        </div>
+                        <br>
+                        <br>
+                        <button class="clueSave ui positive button">
+                            Save
+                        </button>
+                        <br>
+                        <br>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

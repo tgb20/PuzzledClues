@@ -2,6 +2,7 @@ const express = require('express');
 const path = require('path');
 const app = express();
 const mongoose = require('mongoose');
+const bodyParser = require('body-parser');
 const cors = require('cors');
 const dotenv = require("dotenv");
 dotenv.config();
@@ -28,8 +29,118 @@ let boxModel = mongoose.model('boxes', boxSchema);
 let clueModel = mongoose.model('clues', clueSchema);
 
 app.use(cors());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+app.use(bodyParser.raw());
 
 app.use('/', express.static(path.join(__dirname, 'public')))
+
+app.get('/control', function (req, res) {
+    res.sendFile(path.join(__dirname, '/public/control.html'));
+});
+
+app.get('/api/login/:password', (req, res) => {
+    let password = req.params.password;
+
+    if (password == process.env.PANEL_PASSWORD) {
+        res.json({ result: 'valid_password' });
+        return;
+    } else {
+        res.json({ result: 'invalid_password' });
+        return;
+    }
+});
+
+app.get('/api/remove/clue/:id/:password', (req, res) => {
+
+    let password = req.params.password;
+    let clueID = req.params.id;
+
+    if (password != process.env.PANEL_PASSWORD) {
+        res.json({ error: 'invalid_password' });
+        return;
+    }
+
+    if (clueID == 9999) {
+        res.json({ error: 'no_clues' });
+    } else {
+        clueModel.findOneAndRemove({ clueID: clueID }, (err) => {
+            if (err) {
+                res.json({ error: 'database' });
+                return;
+            }
+            res.json({ result: 'success' });
+        });
+    }
+});
+
+app.post('/api/save/clue/:id/:password', (req, res) => {
+
+    let password = req.params.password;
+    let clueID = req.params.id;
+
+    let title = req.body.title;
+    let answer = req.body.answer;
+
+    if (password != process.env.PANEL_PASSWORD) {
+        res.json({ error: 'invalid_password' });
+        return;
+    }
+
+    if (clueID == 9999) {
+
+
+        clueModel.find({}, (err, clues) => {
+
+            if (err) {
+                res.json({ error: 'database' });
+                return;
+            }
+
+            let newClue = new clueModel({ clueID: clues.length + 1, title: title, answer: answer });
+            newClue.save();
+            res.json({ result: 'success' });
+        });
+    } else {
+        clueModel.find({ clueID: clueID }, (err, clues) => {
+            if (err) {
+                res.json({ error: 'database' });
+                return;
+            } else if (clues.length == 0) {
+                res.json({ error: 'no_clues' });
+                return;
+            }
+
+            let clue = clues[0];
+
+            clue.title = title;
+            clue.answer = answer;
+
+            clue.save();
+
+            res.json({ result: 'success' });
+        });
+    }
+});
+
+app.get('/api/panel/clues/:password', (req, res) => {
+    let password = req.params.password;
+
+    if (password != process.env.PANEL_PASSWORD) {
+        res.json({ error: 'invalid_password' });
+        return;
+    }
+
+    clueModel.find({}, (err, clues) => {
+
+        if (err) {
+            res.json({ error: 'database' });
+            return;
+        }
+
+        res.json({ clues: clues });
+    });
+});
 
 app.get('/api/clues/:box_code/:clue_number', (req, res) => {
 
@@ -96,18 +207,18 @@ app.get('/api/clues/:box_code', (req, res) => {
                 res.json({ error: 'database' });
                 return;
             }
-    
+
             let formattedClues = [];
-    
+
             clues.forEach(clue => {
                 let newClue = JSON.parse(JSON.stringify(clue))
-                
-                if(!box.gotClues.includes(newClue.clueID)) {
+
+                if (!box.gotClues.includes(newClue.clueID)) {
                     delete newClue.answer;
                 }
                 formattedClues.push(newClue);
             });
-    
+
             res.json({ clues: formattedClues });
         });
 
