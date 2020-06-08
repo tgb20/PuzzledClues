@@ -64,34 +64,62 @@
             </div>
         </div>
         <div id='boxes-container'>
-            Boxes
+            <div id='boxes-list' class="ui middle aligned divided list">
+                <div id="template-box" class="item">
+                    <div style="width: 100%;" class="ui card">
+                        <div class="content">
+                            <a class="boxTitle header">XXXXX</a>
+                            <div class="meta">
+                                <span class="date">Not Started</span>
+                            </div>
+                            <div class="description">
+                                <div class="ui label">
+                                    <i class="question icon"></i><span class='cluesLeft'></span> Clues left
+                                </div>
+                                <div class="ui label">
+                                    <i class="unlock icon"></i><span class='cluesUsed'></span> Clues Used
+                                </div>
+                            </div>
+                        </div>
+                        <div class="extra content">
+                            <div class="right floated content">
+                                <button class="boxTrash ui icon negative button">
+                                    <i class="trash icon"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
         <div id='clues-container'>
             <div id='clues-list' class="ui middle aligned divided list">
                 <div id="template-clue" class="item">
-                    <div class="right floated content">
-                        <button class="clueTrash ui icon negative button">
-                            <i class="trash icon"></i>
-                        </button>
-                    </div>
-                    <div class="content">
-                        <div style="width:90%" class="ui labeled input">
-                            <label for="clueTitle" class="ui label">Title</label>
-                            <input class="clueTitle" type="text" placeholder="Clue Title...">
+                    <div style="width: 100%;" class="ui card">
+                        <div class="content">
+                            <div style="width:90%" class="ui labeled input">
+                                <label for="clueTitle" class="ui label">Title</label>
+                                <input class="clueTitle" type="text" placeholder="Clue Title...">
+                            </div>
+                            <br>
+                            <br>
+                            <div style="width:90%" class="ui labeled input">
+                                <label for="clueMessage" class="ui label">Answer</label>
+                                <input class="clueMessage" type="text" placeholder="Clue Answer...">
+                            </div>
+                            <br>
+                            <br>
+                            <button class="clueSave ui positive button">
+                                Save
+                            </button>
                         </div>
-                        <br>
-                        <br>
-                        <div style="width:90%" class="ui labeled input">
-                            <label for="clueMessage" class="ui label">Answer</label>
-                            <input class="clueMessage" type="text" placeholder="Clue Answer...">
+                        <div class="extra content">
+                            <div class="right floated content">
+                                <button class="clueTrash ui icon negative button">
+                                    <i class="trash icon"></i>
+                                </button>
+                            </div>
                         </div>
-                        <br>
-                        <br>
-                        <button class="clueSave ui positive button">
-                            Save
-                        </button>
-                        <br>
-                        <br>
                     </div>
                 </div>
             </div>

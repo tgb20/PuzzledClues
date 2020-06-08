@@ -123,6 +123,65 @@ app.post('/api/save/clue/:id/:password', (req, res) => {
     }
 });
 
+app.get('/api/panel/boxes/:password', (req, res) => {
+    let password = req.params.password;
+
+    if (password != process.env.PANEL_PASSWORD) {
+        res.json({ error: 'invalid_password' });
+        return;
+    }
+
+    boxModel.find({}, (err, boxes) => {
+
+        if (err) {
+            res.json({ error: 'database' });
+            return;
+        }
+
+        res.json({ boxes: boxes });
+    });
+});
+
+app.get('/api/panel/newbox/:password', (req, res) => {
+    let password = req.params.password;
+
+    if (password != process.env.PANEL_PASSWORD) {
+        res.json({ error: 'invalid_password' });
+        return;
+    }
+
+    boxModel.find({}, (err, box) => {
+
+        if (err) {
+            res.json({ error: 'database' });
+            return;
+        }
+
+        let newBox = new boxModel({ boxCode: makeid(5), start: Date.parse('2000'), clues: 3, end: Date.parse('2000') });
+        newBox.save();
+        res.json({ box: newBox });
+    });
+});
+
+app.get('/api/remove/box/:code/:password', (req, res) => {
+
+    let password = req.params.password;
+    let code = req.params.code;
+
+    if (password != process.env.PANEL_PASSWORD) {
+        res.json({ error: 'invalid_password' });
+        return;
+    }
+
+    boxModel.findOneAndRemove({ boxCode: code }, (err) => {
+        if (err) {
+            res.json({ error: 'database' });
+            return;
+        }
+        res.json({ result: 'success' });
+    });
+});
+
 app.get('/api/panel/clues/:password', (req, res) => {
     let password = req.params.password;
 
@@ -304,3 +363,13 @@ app.get('/api/start/:box_code', (req, res) => {
 app.listen(PORT, () => {
     console.log(`Server started on port: ${PORT}`);
 });
+
+function makeid(length) {
+    var result = '';
+    var characters = 'ABCDEFGHJKMNPQRSTUVWXYZ0123456789';
+    var charactersLength = characters.length;
+    for (var i = 0; i < length; i++) {
+        result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+    return result;
+}

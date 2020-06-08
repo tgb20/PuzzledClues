@@ -6,6 +6,7 @@ $(() => {
     $('#control-area-container').hide();
     $('#clues-container').hide();
     $('#template-clue').hide();
+    $('#template-box').hide();
     $('#error-message-container').hide();
     $('#positive-message-container').hide();
 
@@ -19,7 +20,38 @@ $(() => {
 
     $('#add-button').click(() => {
         if (mode == 'boxes') {
-            console.log('Box Mode');
+            fetch('/api/panel/newbox/' + password).then((response) => {
+                response.json().then((json => {
+
+                    let box = json.box;
+
+                    let boxCard = $('#template-box').clone();
+                    boxCard.attr('id', '');
+                    boxCard.addClass('box');
+                    boxCard.find('.boxTitle').text(box.boxCode);
+                    boxCard.find('.cluesLeft').text(box.clues);
+                    boxCard.find('.cluesUsed').text(box.gotClues.length);
+                    boxCard.find('.date').text('Not Started');
+
+                    boxCard.find('.boxTrash').click(() => {
+
+                        fetch('/api/remove/box/' + box.boxCode + '/' + password).then((response) => {
+                            response.json().then((json => {
+                                if (!json.error) {
+                                    boxCard.remove();
+                                } else {
+                                    $('#error-title').text('Failed to delete Box');
+                                    $('#error-subtitle').text('There was an error deleting the box');
+                                    $('#error-message-container').show(250);
+                                }
+                            }));
+                        });
+                    });
+
+                    boxCard.show();
+                    boxCard.appendTo('#boxes-list');
+                }));
+            });
         } else {
 
             let clueBox = $('#template-clue').clone();
@@ -86,6 +118,7 @@ $(() => {
         password = $('#password').val();
 
         $('.clue').remove();
+        $('.box').remove();
 
         fetch('/api/login/' + password).then((response) => {
             response.json().then((json => {
@@ -100,8 +133,8 @@ $(() => {
 
                             clues.forEach(clue => {
                                 let clueBox = $('#template-clue').clone();
-                                clueBox.attr("id", "");
-                                clueBox.addClass("clue");
+                                clueBox.attr('id', '');
+                                clueBox.addClass('clue');
 
 
                                 clueBox.find('.clueTitle').val(clue.title);
@@ -165,6 +198,55 @@ $(() => {
                         }));
                     });
 
+                    fetch('/api/panel/boxes/' + password).then((response) => {
+                        response.json().then((json => {
+                            let boxes = json.boxes;
+                            boxes.forEach(box => {
+                                let boxCard = $('#template-box').clone();
+                                boxCard.attr('id', '');
+                                boxCard.addClass('box');
+
+                                boxCard.find('.boxTitle').text(box.boxCode);
+                                boxCard.find('.cluesLeft').text(box.clues);
+                                boxCard.find('.cluesUsed').text(box.gotClues.length);
+
+                                boxCard.find('.boxTrash').click(() => {
+                                    // Delete UI
+
+                                    fetch('/api/remove/box/' + box.boxCode + '/' + password).then((response) => {
+                                        response.json().then((json => {
+                                            if (!json.error) {
+                                                boxCard.remove();
+                                            } else {
+                                                $('#error-title').text('Failed to delete Box');
+                                                $('#error-subtitle').text('There was an error deleting the box');
+                                                $('#error-message-container').show(250);
+                                            }
+                                        }));
+                                    });
+                                    // Delete on Database
+                                });
+
+                                let date = '';
+                                let defaultDate = Date.parse('2000');
+                                // Haven't Started
+                                if (Date.parse(box.start) == defaultDate) {
+                                    date = 'Not Started';
+                                }
+                                else if (Date.parse(box.end) == defaultDate) {
+                                    date = 'Started';
+                                } else {
+                                    date = 'Finished in ' + getTimeString(box.start, box.end);
+                                }
+
+                                boxCard.find('.date').text(date);
+
+                                boxCard.show();
+                                boxCard.appendTo('#boxes-list');
+                            });
+                        }));
+                    });
+
                 } else {
                     $('#error-title').text('Invalid Password');
                     $('#error-subtitle').text('The password you entered is not correct');
@@ -196,3 +278,21 @@ $(() => {
 
 
 });
+
+function getTimeString(startDate, endDate) {
+
+    let start = new Date(startDate);
+    let end = new Date(endDate);
+
+    let difference = end - start;
+
+    seconds = Math.floor((difference / 1000) % 60),
+        minutes = Math.floor((difference / (1000 * 60)) % 60),
+        hours = Math.floor((difference / (1000 * 60 * 60)) % 24);
+
+    hours = (hours < 10) ? "0" + hours : hours;
+    minutes = (minutes < 10) ? "0" + minutes : minutes;
+    seconds = (seconds < 10) ? "0" + seconds : seconds;
+
+    return hours + ":" + minutes + ":" + seconds;
+}
