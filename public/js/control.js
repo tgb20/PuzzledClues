@@ -113,6 +113,152 @@ $(() => {
         }
     });
 
+    if (Cookies.get('password')) {
+        $('#error-message-container').hide();
+        password = Cookies.get('password');
+
+        $('.clue').remove();
+        $('.box').remove();
+
+        fetch('/api/login/' + password).then((response) => {
+            response.json().then((json => {
+                if (json.result == 'valid_password') {
+                    $('#control-area-container').show();
+
+                    fetch('/api/panel/clues/' + password).then((response) => {
+                        response.json().then((json => {
+
+                            let clues = json.clues;
+
+                            clues.forEach(clue => {
+                                let clueBox = $('#template-clue').clone();
+                                clueBox.attr('id', '');
+                                clueBox.addClass('clue');
+
+
+                                clueBox.find('.clueTitle').val(clue.title);
+                                clueBox.find('.clueMessage').val(clue.answer);
+
+
+                                clueBox.find('.clueSave').click(() => {
+
+                                    let clueTitle = clueBox.find('.clueTitle').val();
+                                    let clueAnswer = clueBox.find('.clueMessage').val();
+
+                                    fetch('/api/save/clue/' + clue.clueID + '/' + password, {
+                                        method: 'POST',
+                                        headers: {
+                                            'Accept': 'application/json',
+                                            'Content-Type': 'application/json'
+                                        },
+                                        body: JSON.stringify({
+                                            title: clueTitle,
+                                            answer: clueAnswer
+                                        })
+                                    }).then((response) => {
+                                        response.json().then((json => {
+                                            if (!json.error) {
+                                                console.log('Success!');
+                                                $('#positive-title').text('Saved the clue');
+                                                $('#positive-subtitle').text('The clue has been updated');
+                                                $('#positive-message-container').show(250);
+                                            } else {
+                                                $('#error-title').text('Failed to save Clue');
+                                                $('#error-subtitle').text('There was an error saving the clue');
+                                                $('#error-message-container').show(250);
+                                            }
+                                        }));
+                                    });
+
+                                });
+
+                                clueBox.find('.clueTrash').click(() => {
+                                    // Delete UI
+
+                                    fetch('/api/remove/clue/' + clue.clueID + '/' + password).then((response) => {
+                                        response.json().then((json => {
+                                            if (!json.error) {
+                                                clueBox.remove();
+                                            } else {
+                                                $('#error-title').text('Failed to delete Clue');
+                                                $('#error-subtitle').text('There was an error deleting the clue');
+                                                $('#error-message-container').show(250);
+                                            }
+                                        }));
+                                    });
+                                    // Delete on Database
+                                });
+
+
+                                clueBox.show();
+                                clueBox.appendTo('#clues-list');
+                            });
+
+                        }));
+                    });
+
+                    fetch('/api/panel/boxes/' + password).then((response) => {
+                        response.json().then((json => {
+                            let boxes = json.boxes;
+                            boxes.forEach(box => {
+                                let boxCard = $('#template-box').clone();
+                                boxCard.attr('id', '');
+                                boxCard.addClass('box');
+
+                                boxCard.find('.boxTitle').text(box.boxCode);
+                                boxCard.find('.cluesLeft').text(box.clues);
+                                boxCard.find('.cluesUsed').text(box.gotClues.length);
+
+                                boxCard.find('.boxTrash').click(() => {
+                                    // Delete UI
+
+                                    fetch('/api/remove/box/' + box.boxCode + '/' + password).then((response) => {
+                                        response.json().then((json => {
+                                            if (!json.error) {
+                                                boxCard.remove();
+                                            } else {
+                                                $('#error-title').text('Failed to delete Box');
+                                                $('#error-subtitle').text('There was an error deleting the box');
+                                                $('#error-message-container').show(250);
+                                            }
+                                        }));
+                                    });
+                                    // Delete on Database
+                                });
+
+                                let date = '';
+                                let defaultDate = Date.parse('2000');
+                                // Haven't Started
+                                if (Date.parse(box.start) == defaultDate) {
+                                    date = 'Not Started';
+                                }
+                                else if (Date.parse(box.end) == defaultDate) {
+                                    date = 'Started';
+                                } else {
+                                    date = 'Finished in ' + getTimeString(box.start, box.end);
+                                }
+
+                                boxCard.find('.date').text(date);
+
+                                boxCard.show();
+                                boxCard.appendTo('#boxes-list');
+                            });
+                        }));
+                    });
+
+                } else {
+                    $('#error-title').text('Invalid Password');
+                    $('#error-subtitle').text('The password you entered is not correct');
+                    $('#error-message-container').show(250);
+                }
+            }));
+        });
+
+
+    }
+
+
+
     $('#log-in-button').click(() => {
         $('#error-message-container').hide();
         password = $('#password').val();
@@ -124,7 +270,7 @@ $(() => {
             response.json().then((json => {
                 if (json.result == 'valid_password') {
                     $('#control-area-container').show();
-
+                    Cookies.set('password', password);
 
                     fetch('/api/panel/clues/' + password).then((response) => {
                         response.json().then((json => {
